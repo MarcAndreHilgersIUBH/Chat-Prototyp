@@ -8,7 +8,7 @@ socket.emit("new-connection", { username, roomname, });
 socket.on("room-entered", (data) => {
     const headline = document.getElementById("headline");
     headline.innerHTML = `Chat App - Raum ${data.roomname}`;
-})
+});
 
 socket.on("chat-entered", (data) => {
     console.log("Chat entered >>", data);
