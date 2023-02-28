@@ -1,9 +1,9 @@
-var socket = io.connect();
+var socket = io();
 
 const username = prompt("Bitte Namen eingeben:");
 const roomname = prompt("Bitte Chat-Raum eingeben: ");
 
-socket.emit("new-connection", { username, roomname, });
+socket.emit("new-connection", { username, roomname });
 
 socket.on("room-entered", (data) => {
     const headline = document.getElementById("headline");
@@ -19,7 +19,7 @@ socket.on("chat-entered", (data) => {
 socket.on("new-message", (data) => {
     console.log(`👾 new-message from ${data.user}`);
     // broadcast message to all sockets except the one that triggered the event
-    socket.broadcast.emit("broadcast-message", {
+    socket.emit("broadcast-message", {
         user: users[data.user],
         message: data.message,
     });

@@ -11,7 +11,7 @@ app.get("/", (req, res) => {
 
 });
 
-var users = {};
+const users = {};
 
 io.on("connection", (socket) => {
     console.log("User connected");
@@ -39,9 +39,10 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
-        if (users[socket.id] && users[socket.id]["roomname"] !== undefined){
+        if (users[socket.id] && users[socket.id]["roomname"] !== undefined) {
             console.log("User disconnected " + users[socket.id]["roomname"]);
-            socket.to(users[socket.id]["roomname"]).emit("chat-left", { user: users[socket.id],
+            socket.to(users[socket.id]["roomname"]).emit("chat-left", {
+                user: users[socket.id],
             });
         }
         delete users[socket.id];
