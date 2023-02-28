@@ -3,13 +3,16 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 
+//Einbindung socket.io auf Server-Seite
 const { Server } = require("socket.io");
 const io = new Server(server);
 
 app.use(express.static(__dirname + "/public"));
-app.get("/", (req, res) => {
 
-});
+/* Unnötig(?) 
+// app.get("/", (req, res) => {});
+*/
+
 
 const users = {};
 
@@ -21,12 +24,13 @@ io.on("connection", (socket) => {
         users[socket.id] = { username: data.username, roomname: data.roomname };
         console.log("users :>> ", users);
         socket.join(data.roomname);
-        io.to(data.roomname).emit("room-entered", { roomname: data.roomname });
-        socket.to(data.roomname).emit("chat-entered", {
+        io.to(data.roomname).emit("room-entered", { roomname: data.roomname }); //Anzeige Raumname =>kann entfernt werden
+        socket.to(data.roomname).emit("chat-entered", { 
             user: "server",
             message: `${data.username} ist dem Chat beigetreten`,
         });
     });
+
 
     // handles message posted by client
     socket.on("new-message", (data) => {
@@ -34,9 +38,10 @@ io.on("connection", (socket) => {
         // broadcast message to all sockets except the one that triggered the event
         socket.to(data.roomname).emit("broadcast-message", {
             user: users[socket.id],
-            message: data.message,
+            message: data.message
         });
     });
+    
 
     socket.on("disconnect", () => {
         if (users[socket.id] && users[socket.id]["roomname"] !== undefined) {
@@ -44,6 +49,7 @@ io.on("connection", (socket) => {
             socket.to(users[socket.id]["roomname"]).emit("chat-left", {
                 user: users[socket.id],
             });
+            socket.leave(users[socket.id]["roomname"]);
         }
         delete users[socket.id];
     });
